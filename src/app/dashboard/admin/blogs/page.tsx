@@ -1,0 +1,196 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useState } from "react";
+import Link from "next/link";
+
+export default function AdminBlogsPage() {
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-blogs", page],
+    queryFn: async () => {
+      const res = await api.get(`/blogs?page=${page}&limit=${limit}`);
+      return res as any;
+    },
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this blog post?")) return;
+    try {
+      await api.delete(`/blogs/${id}`);
+      toast.success("Blog deleted successfully");
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete blog");
+    }
+  };
+
+  const handleTogglePublish = async (id: string, currentStatus: boolean) => {
+    try {
+      await api.patch(`/blogs/${id}`, { published: !currentStatus });
+      toast.success(`Blog ${!currentStatus ? 'published' : 'unpublished'}`);
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="border-border/50 shadow-sm animate-in fade-in">
+        <CardHeader>
+          <CardTitle>Blog Management</CardTitle>
+          <CardDescription>Manage your platform's content and articles.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-lg" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const blogs = data?.data || [];
+  const meta = data?.meta || { totalPages: 1, page: 1 };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Blog Posts</h2>
+          <p className="text-muted-foreground">Manage articles, updates, and career tips.</p>
+        </div>
+        <Button className="shrink-0 gap-2">
+          <Plus className="w-4 h-4" /> Create Post
+        </Button>
+      </div>
+
+      <Card className="border-border/50 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <CardContent className="p-0">
+          <div className="rounded-md border-0 bg-card">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead>Post Info</TableHead>
+                  <TableHead>Author</TableHead>
+                  <TableHead className="text-center">Views</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {blogs.map((blog: any) => (
+                  <TableRow key={blog.id} className="group">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-8 rounded shrink-0 bg-muted overflow-hidden border">
+                          <img src={blog.coverImage || "https://placehold.co/100x60"} alt={blog.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="font-medium truncate max-w-[250px]">{blog.title}</span>
+                          <span className="text-xs text-muted-foreground truncate">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {blog.author}
+                    </TableCell>
+                    <TableCell className="text-center font-medium">
+                      <Badge variant="outline" className="bg-background">
+                        {blog.views}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => handleTogglePublish(blog.id, blog.published)}>
+                        <Badge 
+                          variant={blog.published ? "default" : "secondary"}
+                          className={`cursor-pointer hover:opacity-80 transition-opacity ${blog.published ? "bg-emerald-500 hover:bg-emerald-600 text-white" : ""}`}
+                        >
+                          {blog.published ? "Published" : "Draft"}
+                        </Badge>
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
+                          <Link href={`/blog/${blog.slug}`} target="_blank">
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleDelete(blog.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                
+                {blogs.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                      No blog posts found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          
+          {meta.totalPages > 1 && (
+            <div className="flex items-center justify-between p-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing page {page} of {meta.totalPages}
+              </p>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+                  disabled={page === meta.totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
