@@ -24,6 +24,7 @@ export default function InterviewsPage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [feedback, setFeedback] = useState<Record<number, any>>({});
   const [evaluatingId, setEvaluatingId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState("practice");
 
   const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: ["interviews-history"],
@@ -38,6 +39,7 @@ export default function InterviewsPage() {
     onSuccess: (data) => {
       toast.success("Interview questions generated!");
       setActiveInterview(data);
+      setActiveTab("practice");
       setAnswers({});
       setFeedback({});
       queryClient.invalidateQueries({ queryKey: ["interviews-history"] });
@@ -96,7 +98,7 @@ export default function InterviewsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="practice" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md mb-8">
           <TabsTrigger value="practice">Practice Area</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
@@ -160,13 +162,13 @@ export default function InterviewsPage() {
                   </h2>
                   <div className="flex gap-2 mt-2">
                     <Badge variant="outline" className="capitalize">{activeInterview.difficulty}</Badge>
-                    <Badge variant="secondary">{activeInterview.questions.length} Questions</Badge>
+                    <Badge variant="secondary">{Array.isArray(activeInterview.questions) ? activeInterview.questions.length : 0} Questions</Badge>
                   </div>
                 </div>
                 <Button variant="outline" onClick={() => setActiveInterview(null)}>Start New Session</Button>
               </div>
 
-              {activeInterview.generalTips && activeInterview.generalTips.length > 0 && (
+              {activeInterview.generalTips && activeInterview.generalTips?.length > 0 && (
                 <Card className="bg-primary/5 border-primary/20">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -176,7 +178,7 @@ export default function InterviewsPage() {
                   </CardHeader>
                   <CardContent>
                     <ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">
-                      {activeInterview.generalTips.map((tip: string, i: number) => (
+                      {activeInterview.generalTips?.map((tip: string, i: number) => (
                         <li key={i}>{tip}</li>
                       ))}
                     </ul>
@@ -185,7 +187,7 @@ export default function InterviewsPage() {
               )}
 
               <div className="space-y-8">
-                {activeInterview.questions.map((q: any, index: number) => (
+                {Array.isArray(activeInterview.questions) && activeInterview.questions.map((q: any, index: number) => (
                   <Card key={q.id} className="overflow-hidden">
                     <CardHeader className="bg-muted/30 border-b">
                       <div className="flex justify-between items-start gap-4">
@@ -297,7 +299,17 @@ export default function InterviewsPage() {
               ) : (
                 <div className="space-y-4">
                   {history?.data?.map((item: any) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        // The history item stores the full interview object in the 'questions' field
+                        const interviewData = item.questions && typeof item.questions === "object" ? item.questions : item;
+                        setActiveInterview(interviewData);
+                        setActiveTab("practice");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    >
                       <div className="flex flex-col">
                         <span className="font-medium flex items-center gap-2">
                           {item.role} {item.company ? `at ${item.company}` : ""}

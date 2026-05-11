@@ -59,8 +59,8 @@ function ServicesContent() {
 
   const { data: servicesResponse, isLoading } = useQuery({
     queryKey: ["services", debouncedSearch, category, sortBy, page],
-    queryFn: () =>
-      api.get("/services", {
+    queryFn: async () => {
+      const res = await api.get("/services", {
         params: {
           search: debouncedSearch || undefined,
           category: category !== "all" ? category : undefined,
@@ -68,22 +68,30 @@ function ServicesContent() {
           page,
           limit: ITEMS_PER_PAGE,
         },
-      }),
+      });
+      return res as any;
+    },
   });
 
   const { data: categories } = useQuery({
     queryKey: ["service-categories"],
-    queryFn: () => api.get("/services/categories"),
+    queryFn: async () => {
+      const res = await api.get("/services/categories");
+      return res as any;
+    },
   });
 
   const { data: statsResponse } = useQuery({
     queryKey: ["public-stats"],
-    queryFn: () => api.get("/users/public-stats"),
+    queryFn: async () => {
+      const res = await api.get("/users/public-stats");
+      return res as any;
+    },
   });
 
   const stats = statsResponse?.data;
-  const services = servicesResponse?.data?.data || servicesResponse?.data || [];
-  const meta = servicesResponse?.data?.meta || { page: 1, totalPages: 1, total: 0 };
+  const services = servicesResponse?.data || [];
+  const meta = servicesResponse?.meta || { page: 1, totalPages: 1, total: 0 };
 
   // Reset to page 1 when filters change
   const handleSearchChange = useCallback((val: string) => {

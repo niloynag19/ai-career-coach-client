@@ -45,6 +45,7 @@ export function Sidebar({ className }: { className?: string }) {
     { name: "Manage Services", href: "/dashboard/admin/services", icon: HiOutlineBriefcase },
     { name: "Manage Blogs", href: "/dashboard/admin/blogs", icon: HiOutlineDocumentText },
     { name: "Inbox", href: "/dashboard/admin/inbox", icon: HiOutlineChatBubbleLeftRight },
+    { name: "System History", href: "/dashboard/admin/history", icon: HiBars3 },
   ];
 
   return (
@@ -58,7 +59,7 @@ export function Sidebar({ className }: { className?: string }) {
         </Link>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+      <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8" data-lenis-prevent>
         <div>
           <p className="text-xs font-medium text-muted-foreground mb-4 uppercase tracking-wider px-2">Menu</p>
           <nav className="space-y-1">

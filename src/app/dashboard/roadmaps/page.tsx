@@ -27,6 +27,7 @@ export default function RoadmapsPage() {
 
   const [activeRoadmap, setActiveRoadmap] = useState<any>(null);
   const [activeSkillGap, setActiveSkillGap] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("roadmap");
 
   const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: ["roadmaps-history"],
@@ -41,6 +42,7 @@ export default function RoadmapsPage() {
     onSuccess: (data) => {
       toast.success("Career roadmap generated!");
       setActiveRoadmap(data);
+      setActiveTab("roadmap");
       queryClient.invalidateQueries({ queryKey: ["roadmaps-history"] });
     },
     onError: (error: any) => {
@@ -105,7 +107,7 @@ export default function RoadmapsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="roadmap" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-2xl mb-8">
           <TabsTrigger value="roadmap">Career Roadmap</TabsTrigger>
           <TabsTrigger value="skillgap">Skill Gap Analyzer</TabsTrigger>
@@ -201,7 +203,7 @@ export default function RoadmapsPage() {
                 <div className="md:col-span-2 space-y-6">
                   <h3 className="text-xl font-bold mb-4">Your Roadmap Phases</h3>
                   <div className="relative border-l-2 border-primary/20 ml-3 md:ml-4 space-y-8 pb-4">
-                    {activeRoadmap.phases.map((phase: any, idx: number) => (
+                    {activeRoadmap.phases?.map((phase: any, idx: number) => (
                       <div key={idx} className="relative pl-6 md:pl-8">
                         <div className="absolute w-6 h-6 bg-primary rounded-full -left-[13px] top-0 flex items-center justify-center ring-4 ring-background">
                           <span className="text-[10px] font-bold text-primary-foreground">{phase.phase}</span>
@@ -278,7 +280,7 @@ export default function RoadmapsPage() {
                       </CardHeader>
                       <CardContent>
                         <ul className="space-y-2 text-sm">
-                          {activeRoadmap.certifications.map((cert: string, i: number) => (
+                          {activeRoadmap.certifications?.map((cert: string, i: number) => (
                             <li key={i} className="bg-muted/50 p-2 rounded-md">{cert}</li>
                           ))}
                         </ul>
@@ -295,7 +297,7 @@ export default function RoadmapsPage() {
                       </CardHeader>
                       <CardContent>
                         <ul className="space-y-3 text-sm list-disc list-inside text-muted-foreground">
-                          {activeRoadmap.projectIdeas.map((proj: string, i: number) => (
+                          {activeRoadmap.projectIdeas?.map((proj: string, i: number) => (
                             <li key={i}>{proj}</li>
                           ))}
                         </ul>
@@ -348,7 +350,7 @@ export default function RoadmapsPage() {
                       <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-muted/20" />
                       <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="12" fill="transparent"
                         strokeDasharray={351.8}
-                        strokeDashoffset={351.8 - (351.8 * activeSkillGap.overallReadiness) / 100}
+                        strokeDashoffset={351.8 - (351.8 * (activeSkillGap.overallReadiness || 0)) / 100}
                         className={activeSkillGap.overallReadiness >= 70 ? "text-green-500" : activeSkillGap.overallReadiness >= 40 ? "text-orange-500" : "text-red-500"}
                       />
                     </svg>
@@ -459,7 +461,15 @@ export default function RoadmapsPage() {
               ) : (
                 <div className="space-y-4">
                   {history?.data?.map((item: any) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        setActiveRoadmap(item.roadmapData || item);
+                        setActiveTab("roadmap");
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    >
                       <div className="flex flex-col">
                         <span className="font-medium flex items-center gap-2">
                           {item.currentRole || "Entry"} → {item.targetRole}

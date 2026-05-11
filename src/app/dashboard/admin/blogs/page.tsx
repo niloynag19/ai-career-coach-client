@@ -18,15 +18,18 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useState } from "react";
 import Link from "next/link";
+import { BlogDialog } from "./blog-dialog";
 
 export default function AdminBlogsPage() {
   const [page, setPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState<any>(null);
   const limit = 10;
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["admin-blogs", page],
     queryFn: async () => {
-      const res = await api.get(`/blogs?page=${page}&limit=${limit}`);
+      const res = await api.get(`/blogs/admin?page=${page}&limit=${limit}`);
       return res as any;
     },
   });
@@ -50,6 +53,16 @@ export default function AdminBlogsPage() {
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
     }
+  };
+
+  const handleEdit = (blog: any) => {
+    setSelectedBlog(blog);
+    setIsDialogOpen(true);
+  };
+
+  const handleAdd = () => {
+    setSelectedBlog(null);
+    setIsDialogOpen(true);
   };
 
   if (isLoading) {
@@ -80,6 +93,9 @@ export default function AdminBlogsPage() {
           <h2 className="text-2xl font-bold tracking-tight">Blog Posts</h2>
           <p className="text-muted-foreground">Manage articles, updates, and career tips.</p>
         </div>
+        <Button className="shrink-0 gap-2" onClick={handleAdd}>
+          <Plus className="w-4 h-4" /> Add Post
+        </Button>
       </div>
 
       <Card className="border-border/50 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -121,7 +137,7 @@ export default function AdminBlogsPage() {
                       <button onClick={() => handleTogglePublish(blog.id, blog.published)}>
                         <Badge 
                           variant={blog.published ? "default" : "secondary"}
-                          className={`cursor-pointer hover:opacity-80 transition-opacity ${blog.published ? "bg-emerald-500 hover:bg-emerald-600 text-white" : ""}`}
+                          className={`cursor-pointer hover:opacity-80 transition-opacity ${blog.published ? "bg-primary hover:bg-primary/90 text-primary-foreground" : ""}`}
                         >
                           {blog.published ? "Published" : "Draft"}
                         </Badge>
@@ -134,7 +150,12 @@ export default function AdminBlogsPage() {
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          onClick={() => handleEdit(blog)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -188,6 +209,12 @@ export default function AdminBlogsPage() {
           )}
         </CardContent>
       </Card>
+      <BlogDialog 
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        blog={selectedBlog}
+        onSuccess={refetch}
+      />
     </div>
   );
 }

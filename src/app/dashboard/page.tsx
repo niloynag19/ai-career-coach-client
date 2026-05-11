@@ -84,10 +84,10 @@ export default function DashboardPage() {
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Users" value={stats.totalUsers} icon={Users} color="text-primary" bgColor="bg-primary/10" />
-          <StatCard title="Resumes Analyzed" value={stats.totalResumes} icon={FileText} color="text-secondary" bgColor="bg-secondary/10" />
-          <StatCard title="Mock Interviews" value={stats.totalInterviews} icon={Briefcase} color="text-purple-500" bgColor="bg-purple-500/10" />
-          <StatCard title="Messages" value={stats.totalContacts} icon={MessageSquare} color="text-amber-500" bgColor="bg-amber-500/10" />
+          <StatCard title="Total Users" value={stats.totalUsers} icon={Users} color="text-primary" bgColor="bg-primary/10" href="/dashboard/admin/users" />
+          <StatCard title="Resumes Analyzed" value={stats.totalResumes} icon={FileText} color="text-secondary" bgColor="bg-secondary/10" href="/dashboard/admin/history?tab=resumes" />
+          <StatCard title="Mock Interviews" value={stats.totalInterviews} icon={Briefcase} color="text-purple-500" bgColor="bg-purple-500/10" href="/dashboard/admin/history?tab=interviews" />
+          <StatCard title="Messages" value={stats.totalContacts} icon={MessageSquare} color="text-amber-500" bgColor="bg-amber-500/10" href="/dashboard/admin/inbox" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -163,10 +163,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Resumes Analyzed" value={stats.resumeCount} icon={FileText} color="text-primary" bgColor="bg-primary/10" />
-        <StatCard title="Interviews Practiced" value={stats.interviewCount} icon={Briefcase} color="text-secondary" bgColor="bg-secondary/10" />
-        <StatCard title="Roadmaps Created" value={stats.roadmapCount} icon={Map} color="text-amber-500" bgColor="bg-amber-500/10" />
-        <StatCard title="AI Coaching Chats" value={stats.chatCount} icon={Bot} color="text-purple-500" bgColor="bg-purple-500/10" />
+        <StatCard title="Resumes Analyzed" value={stats.resumeCount} icon={FileText} color="text-primary" bgColor="bg-primary/10" href="/dashboard/resumes" />
+        <StatCard title="Interviews Practiced" value={stats.interviewCount} icon={Briefcase} color="text-secondary" bgColor="bg-secondary/10" href="/dashboard/interviews" />
+        <StatCard title="Roadmaps Created" value={stats.roadmapCount} icon={Map} color="text-amber-500" bgColor="bg-amber-500/10" href="/dashboard/roadmaps" />
+        <StatCard title="AI Coaching Chats" value={stats.chatCount} icon={Bot} color="text-purple-500" bgColor="bg-purple-500/10" href="/dashboard/chat" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -256,18 +256,28 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, icon: Icon, color, bgColor }: any) {
+function StatCard({ title, value, icon: Icon, color, bgColor, href }: any) {
+  const content = (
+    <CardContent className="p-6 flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+        <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
+      </div>
+      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", bgColor)}>
+        <Icon className={cn("w-6 h-6", color)} />
+      </div>
+    </CardContent>
+  );
+
   return (
-    <Card className="border-border/50 shadow-sm">
-      <CardContent className="p-6 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-          <h3 className="text-3xl font-bold tracking-tight">{value}</h3>
-        </div>
-        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", bgColor)}>
-          <Icon className={cn("w-6 h-6", color)} />
-        </div>
-      </CardContent>
+    <Card className={cn("border-border/50 shadow-sm transition-all duration-300", href && "hover:shadow-md hover:-translate-y-1 cursor-pointer")}>
+      {href ? (
+        <Link href={href}>
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
     </Card>
   );
 }

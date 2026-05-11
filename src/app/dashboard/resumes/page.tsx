@@ -22,6 +22,7 @@ export default function ResumesPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [activeAnalysis, setActiveAnalysis] = useState<any>(null);
   const [activeAts, setActiveAts] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("analyzer");
 
   const { data: history, isLoading: historyLoading } = useQuery({
     queryKey: ["resumes-history"],
@@ -38,6 +39,7 @@ export default function ResumesPage() {
     onSuccess: (data) => {
       toast.success("Resume analyzed successfully!");
       setActiveAnalysis(data);
+      setActiveTab("analyzer");
       queryClient.invalidateQueries({ queryKey: ["resumes-history"] });
     },
     onError: (error: any) => {
@@ -55,6 +57,7 @@ export default function ResumesPage() {
     onSuccess: (data) => {
       toast.success("ATS Score checked successfully!");
       setActiveAts(data);
+      setActiveTab("ats");
       queryClient.invalidateQueries({ queryKey: ["resumes-history"] });
     },
     onError: (error: any) => {
@@ -112,7 +115,7 @@ export default function ResumesPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="analyzer" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-2xl mb-8">
           <TabsTrigger value="analyzer">Resume Analyzer</TabsTrigger>
           <TabsTrigger value="ats">ATS Checker</TabsTrigger>
@@ -275,12 +278,12 @@ export default function ResumesPage() {
                         <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="10" fill="transparent" className="text-muted/20" />
                         <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="10" fill="transparent"
                           strokeDasharray={440}
-                          strokeDashoffset={440 - (440 * activeAts.atsScore) / 100}
+                          strokeDashoffset={440 - (440 * ((activeAts.atsScore || 0))) / 100}
                           className="text-primary transition-all duration-1000 ease-out"
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-4xl font-bold">{activeAts.atsScore}%</span>
+                        <span className="text-4xl font-bold">{(activeAts.atsScore || 0)}%</span>
                         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Match</span>
                       </div>
                     </div>
@@ -346,7 +349,21 @@ export default function ResumesPage() {
               ) : (
                 <div className="space-y-4">
                   {history?.data?.map((item: any) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <div 
+                      key={item.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => {
+                        const status = item.status?.toUpperCase();
+                        if (status === "ANALYZED") {
+                          setActiveAnalysis(item.analysis || item);
+                          setActiveTab("analyzer");
+                        } else {
+                          setActiveAts(item.analysis || item);
+                          setActiveTab("ats");
+                        }
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                    >
                       <div className="flex flex-col">
                         <span className="font-medium flex items-center gap-2">
                           {item.fileName}
@@ -359,7 +376,9 @@ export default function ResumesPage() {
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-2xl font-bold">{item.atsScore}%</span>
+                        <span className="text-2xl font-bold">
+                          {item.atsScore || item.analysis?.overallScore || item.analysis?.atsScore || 0}%
+                        </span>
                         <p className="text-xs text-muted-foreground uppercase tracking-wider">Score</p>
                       </div>
                     </div>
