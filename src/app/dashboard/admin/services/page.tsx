@@ -17,9 +17,12 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useState } from "react";
+import { ServiceDialog } from "./service-dialog";
 
 export default function AdminServicesPage() {
   const [page, setPage] = useState(1);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<any>(null);
   const limit = 10;
 
   const { data, isLoading, refetch } = useQuery({
@@ -39,6 +42,16 @@ export default function AdminServicesPage() {
     } catch (error: any) {
       toast.error(error.message || "Failed to delete service");
     }
+  };
+
+  const handleEdit = (service: any) => {
+    setSelectedService(service);
+    setIsDialogOpen(true);
+  };
+
+  const handleAdd = () => {
+    setSelectedService(null);
+    setIsDialogOpen(true);
   };
 
   if (isLoading) {
@@ -69,7 +82,7 @@ export default function AdminServicesPage() {
           <h2 className="text-2xl font-bold tracking-tight">Services</h2>
           <p className="text-muted-foreground">Manage your platform's offerings.</p>
         </div>
-        <Button className="shrink-0 gap-2">
+        <Button className="shrink-0 gap-2" onClick={handleAdd}>
           <Plus className="w-4 h-4" /> Add Service
         </Button>
       </div>
@@ -82,7 +95,6 @@ export default function AdminServicesPage() {
                 <TableRow className="bg-muted/50 hover:bg-muted/50">
                   <TableHead>Service Info</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead className="text-center">Price</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -101,9 +113,6 @@ export default function AdminServicesPage() {
                     <TableCell>
                       <Badge variant="outline" className="capitalize">{service.category.replace("-", " ")}</Badge>
                     </TableCell>
-                    <TableCell className="text-center font-medium">
-                      {service.price ? `$${service.price}` : "Free"}
-                    </TableCell>
                     <TableCell className="text-center">
                       <Badge variant={service.isPopular ? "default" : "secondary"}>
                         {service.isPopular ? "Popular" : "Standard"}
@@ -111,7 +120,12 @@ export default function AdminServicesPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          onClick={() => handleEdit(service)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
@@ -129,7 +143,7 @@ export default function AdminServicesPage() {
                 
                 {services.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
                       No services found.
                     </TableCell>
                   </TableRow>
@@ -165,6 +179,13 @@ export default function AdminServicesPage() {
           )}
         </CardContent>
       </Card>
+
+      <ServiceDialog 
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        service={selectedService}
+        onSuccess={refetch}
+      />
     </div>
   );
 }

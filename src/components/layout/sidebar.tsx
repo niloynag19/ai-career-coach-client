@@ -5,18 +5,17 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { 
-  Compass, 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  Briefcase, 
-  Settings, 
-  LogOut,
-  Menu,
-  MessageSquare,
-  Map,
-  Bot
-} from "lucide-react";
+  HiBars3, 
+  HiOutlineSquares2X2, 
+  HiOutlineUsers, 
+  HiOutlineDocumentText, 
+  HiOutlineBriefcase, 
+  HiOutlineCog6Tooth, 
+  HiOutlineArrowRightOnRectangle,
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineMap
+} from "react-icons/hi2";
+import { RiCompassDiscoverLine, RiRobot2Line } from "react-icons/ri";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -33,19 +32,19 @@ export function Sidebar({ className }: { className?: string }) {
   };
 
   const navItems = [
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "My Resumes", href: "/dashboard/resumes", icon: FileText },
-    { name: "Interviews", href: "/dashboard/interviews", icon: Briefcase },
-    { name: "Career Roadmap", href: "/dashboard/roadmaps", icon: Map },
-    { name: "AI Coach", href: "/dashboard/chat", icon: Bot },
-    { name: "Profile", href: "/dashboard/settings", icon: Settings },
+    { name: "Overview", href: "/dashboard", icon: HiOutlineSquares2X2 },
+    { name: "My Resumes", href: "/dashboard/resumes", icon: HiOutlineDocumentText },
+    { name: "Interviews", href: "/dashboard/interviews", icon: HiOutlineBriefcase },
+    { name: "Career Roadmap", href: "/dashboard/roadmaps", icon: HiOutlineMap },
+    { name: "AI Coach", href: "/dashboard/chat", icon: RiRobot2Line },
+    { name: "Profile", href: "/dashboard/settings", icon: HiOutlineCog6Tooth },
   ];
 
   const adminItems = [
-    { name: "Manage Users", href: "/dashboard/admin/users", icon: Users },
-    { name: "Manage Services", href: "/dashboard/admin/services", icon: Briefcase },
-    { name: "Manage Blogs", href: "/dashboard/admin/blogs", icon: FileText },
-    { name: "Inbox", href: "/dashboard/admin/inbox", icon: MessageSquare },
+    { name: "Manage Users", href: "/dashboard/admin/users", icon: HiOutlineUsers },
+    { name: "Manage Services", href: "/dashboard/admin/services", icon: HiOutlineBriefcase },
+    { name: "Manage Blogs", href: "/dashboard/admin/blogs", icon: HiOutlineDocumentText },
+    { name: "Inbox", href: "/dashboard/admin/inbox", icon: HiOutlineChatBubbleLeftRight },
   ];
 
   return (
@@ -53,7 +52,7 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="p-6 border-b">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="bg-primary p-1.5 rounded-lg group-hover:scale-105 transition-transform">
-            <Compass className="w-5 h-5 text-primary-foreground" />
+            <RiCompassDiscoverLine className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="font-bold text-lg tracking-tight">CareerPilot</span>
         </Link>
@@ -110,7 +109,7 @@ export function Sidebar({ className }: { className?: string }) {
           onClick={handleLogout}
           className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
         >
-          <LogOut className="w-4 h-4" />
+          <HiOutlineArrowRightOnRectangle className="w-4 h-4" />
           Logout
         </button>
         <div className="ml-2">

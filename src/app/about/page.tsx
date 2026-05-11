@@ -97,45 +97,47 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent h-[500px] blur-3xl -z-10" />
-        </div>
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.05)_1px,transparent_1px),linear_gradient(to_bottom,hsl(var(--primary)/0.05)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10" />
+      <section className="relative pt-16 pb-12 md:pt-24 md:pb-16 overflow-hidden hero-gradient-bg">
+        {/* Background Patterns */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.08),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.03)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
         
         <div className="container relative mx-auto px-4 text-center max-w-4xl">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary rounded-full px-4 py-1.5 text-sm font-medium mb-8 backdrop-blur-sm">
-              <Sparkles className="w-4 h-4" />
-              Redefining Career Growth
+            <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 text-primary rounded-full px-3.5 py-1 text-[10px] uppercase tracking-wider font-bold mb-5 backdrop-blur-md shadow-sm">
+              <Sparkles className="w-3 h-3" />
+              Empowering the Future of Work
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-              Your Career,{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">
-                Supercharged by AI
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-5 leading-[1.15]">
+              Elevating Careers with{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary bg-[size:200%] animate-gradient">
+                Human-Centric AI
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
-              We are building the intelligence layer for your professional journey. Combining advanced machine learning with deep career science to unlock your ultimate potential.
+            <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-7 font-medium">
+              We bridge the gap between human potential and algorithmic intelligence to build the most advanced career optimization platform on the planet.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "rounded-full px-8 h-12 text-base")}>
-                Start Your Journey
+            <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-center">
+              <Link href="/register" className={cn(buttonVariants({ size: "default" }), "rounded-full px-7 h-11 text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all")}>
+                Get Started Now
               </Link>
-              <Link href="#our-story" className={cn(buttonVariants({ size: "lg", variant: "ghost" }), "rounded-full px-8 h-12 text-base")}>
-                Read Our Story
+              <Link href="#our-story" className={cn(buttonVariants({ size: "default", variant: "outline" }), "rounded-full px-7 h-11 text-sm backdrop-blur-sm bg-background/20")}>
+                Explore Our Vision
               </Link>
             </div>
           </motion.div>
         </div>
+
+        {/* Decorative elements */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
       </section>
 
       {/* Impact Stats */}
-      <section className="py-20 border-y bg-muted/30 relative overflow-hidden">
+      <section className="py-12 border-y bg-muted/30 relative overflow-hidden">
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
           <motion.div 
             variants={staggerContainer}
@@ -149,11 +151,11 @@ export default function AboutPage() {
                 variants={fadeUp}
                 className="text-center group"
               >
-                <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 transition-transform group-hover:scale-110 duration-300", stat.bg)}>
-                  <stat.icon className={cn("w-8 h-8", stat.color)} />
+                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110 duration-300", stat.bg)}>
+                  <stat.icon className={cn("w-6 h-6", stat.color)} />
                 </div>
-                <h3 className="text-4xl md:text-5xl font-bold mb-2 tracking-tight">{stat.value}</h3>
-                <p className="text-base text-muted-foreground font-medium">{stat.label}</p>
+                <h3 className="text-2xl md:text-3xl font-bold mb-1 tracking-tight">{stat.value}</h3>
+                <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>

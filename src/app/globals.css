@@ -48,64 +48,64 @@
 
 @layer base {
   :root {
-    --background: 240 20% 99%;
-    --foreground: 240 10% 15%;
+    --background: 191 42% 94%;
+    --foreground: 194 87% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 194 87% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
-    --primary: 235 85% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 235 20% 94%;
-    --secondary-foreground: 240 10% 15%;
-    --muted: 240 10% 96%;
-    --muted-foreground: 240 5% 45%;
-    --accent: 235 20% 94%;
-    --accent-foreground: 235 85% 60%;
-    --destructive: 348 83% 58%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 10% 90%;
-    --input: 240 10% 90%;
-    --ring: 235 85% 60%;
+    --popover-foreground: 194 87% 10%;
+    --primary: 194 87% 27%;
+    --primary-foreground: 191 42% 94%;
+    --secondary: 188 90% 31%;
+    --secondary-foreground: 191 42% 94%;
+    --muted: 191 42% 88%;
+    --muted-foreground: 188 90% 25%;
+    --accent: 180 27% 59%;
+    --accent-foreground: 194 87% 27%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 191 42% 85%;
+    --input: 191 42% 85%;
+    --ring: 194 87% 27%;
     --radius: 0.75rem;
-    --sidebar-background: 240 20% 98%;
-    --sidebar-foreground: 240 10% 20%;
-    --sidebar-primary: 235 85% 60%;
+    --sidebar-background: 191 42% 92%;
+    --sidebar-foreground: 194 87% 15%;
+    --sidebar-primary: 194 87% 27%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 94%;
-    --sidebar-accent-foreground: 235 85% 60%;
-    --sidebar-border: 240 10% 90%;
-    --sidebar-ring: 235 85% 60%;
+    --sidebar-accent: 180 27% 94%;
+    --sidebar-accent-foreground: 194 87% 27%;
+    --sidebar-border: 191 42% 88%;
+    --sidebar-ring: 194 87% 27%;
   }
 
   .dark {
-    --background: 230 25% 6%;
-    --foreground: 230 20% 90%;
-    --card: 230 25% 10%;
-    --card-foreground: 230 20% 90%;
-    --popover: 230 25% 10%;
-    --popover-foreground: 230 20% 90%;
-    --primary: 235 85% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 230 25% 15%;
-    --secondary-foreground: 230 20% 90%;
-    --muted: 230 25% 15%;
-    --muted-foreground: 230 10% 65%;
-    --accent: 230 25% 15%;
-    --accent-foreground: 235 85% 65%;
-    --destructive: 348 83% 58%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 230 25% 16%;
-    --input: 230 25% 16%;
-    --ring: 235 85% 65%;
-    --sidebar-background: 230 25% 8%;
-    --sidebar-foreground: 230 20% 85%;
-    --sidebar-primary: 235 85% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 25% 15%;
-    --sidebar-accent-foreground: 235 85% 65%;
-    --sidebar-border: 230 25% 16%;
-    --sidebar-ring: 235 85% 65%;
+    --background: 194 87% 4%;
+    --foreground: 191 42% 94%;
+    --card: 194 87% 6%;
+    --card-foreground: 191 42% 94%;
+    --popover: 194 87% 6%;
+    --popover-foreground: 191 42% 94%;
+    --primary: 188 90% 40%;
+    --primary-foreground: 194 87% 4%;
+    --secondary: 194 87% 12%;
+    --secondary-foreground: 191 42% 94%;
+    --muted: 194 87% 10%;
+    --muted-foreground: 191 42% 70%;
+    --accent: 180 27% 50%;
+    --accent-foreground: 191 42% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 191 42% 94%;
+    --border: 194 87% 14%;
+    --input: 194 87% 14%;
+    --ring: 188 90% 40%;
+    --sidebar-background: 194 87% 3%;
+    --sidebar-foreground: 191 42% 90%;
+    --sidebar-primary: 188 90% 40%;
+    --sidebar-primary-foreground: 194 87% 4%;
+    --sidebar-accent: 194 87% 10%;
+    --sidebar-accent-foreground: 180 27% 50%;
+    --sidebar-border: 194 87% 14%;
+    --sidebar-ring: 188 90% 40%;
   }
 
   * {
@@ -116,5 +116,45 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .hero-gradient-bg {
+    background: linear-gradient(-45deg, 
+      hsl(var(--primary) / 0.1), 
+      hsl(var(--background)), 
+      hsl(var(--secondary) / 0.1), 
+      hsl(var(--background))
+    );
+  }
+
+  :is(.dark *) .hero-gradient-bg {
+    background: hsl(var(--background));
+  }
+
+  @keyframes mesh-gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient {
+    animation: text-gradient 5s ease infinite;
+  }
+
+  @keyframes text-gradient {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 }

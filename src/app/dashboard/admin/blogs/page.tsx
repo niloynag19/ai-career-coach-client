@@ -80,9 +80,6 @@ export default function AdminBlogsPage() {
           <h2 className="text-2xl font-bold tracking-tight">Blog Posts</h2>
           <p className="text-muted-foreground">Manage articles, updates, and career tips.</p>
         </div>
-        <Button className="shrink-0 gap-2">
-          <Plus className="w-4 h-4" /> Create Post
-        </Button>
       </div>
 
       <Card className="border-border/50 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">

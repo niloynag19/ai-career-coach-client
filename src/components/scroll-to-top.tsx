@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { HiOutlineArrowUp } from "react-icons/hi2";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
@@ -45,7 +45,7 @@ export function ScrollToTop() {
             className="rounded-full w-12 h-12 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
             aria-label="Scroll to top"
           >
-            <ArrowUp className="w-5 h-5" />
+            <HiOutlineArrowUp className="w-5 h-5" />
           </Button>
         </motion.div>
       )}

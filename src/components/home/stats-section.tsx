@@ -55,11 +55,11 @@ export function StatsSection() {
   ];
 
   return (
-    <section className="py-24 md:py-32 bg-background relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-background relative overflow-hidden">
       <div className="container px-4 md:px-6 mx-auto">
         
         {/* Massive Premium Container */}
-        <div className="relative rounded-[2.5rem] overflow-hidden bg-card border border-border shadow-xl p-8 md:p-16">
+        <div className="relative rounded-[2rem] overflow-hidden bg-card border border-border shadow-xl p-8 md:p-12">
           
           {/* Background Effects inside container */}
           <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:32px]" />
@@ -102,11 +102,11 @@ export function StatsSection() {
                       <ArrowUpRight className="w-5 h-5 text-slate-500 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" />
                     </div>
                     
-                    <div className="mb-2">
-                      <h3 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">{stat.value}</h3>
+                    <div className="mb-1">
+                      <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">{stat.value}</h3>
                     </div>
                     
-                    <p className="text-lg font-medium text-muted-foreground mb-4">{stat.label}</p>
+                    <p className="text-base font-semibold text-muted-foreground mb-4">{stat.label}</p>
                     
                     <div className="mt-auto pt-4 border-t border-border">
                       <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">

@@ -69,6 +69,20 @@ export default function RegisterPage() {
     }
   }
 
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${window.location.origin}/dashboard`,
+      });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in with Google");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
@@ -175,7 +189,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <Button variant="outline" type="button" disabled={isLoading} onClick={() => {}}>
+            <Button variant="outline" type="button" disabled={isLoading} onClick={handleGoogleLogin}>
               <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
                 <path
                   fill="currentColor"

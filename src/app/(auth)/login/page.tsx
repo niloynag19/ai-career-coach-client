@@ -61,21 +61,21 @@ export default function LoginPage() {
     }
   }
 
-  const handleDemoLogin = async (role: "user" | "admin" | "manager") => {
+  async function handleDemoLogin(role: "user" | "admin" | "manager") {
     setIsLoading(true);
     try {
       const demoAccounts = {
         user: "arif@careerpilot.ai",
         admin: "admin@careerpilot.ai",
-        manager: "sarah@careerpilot.ai"
+        manager: "sarah@careerpilot.ai",
       };
       const email = demoAccounts[role];
       const password = role === "admin" ? "Admin@123" : "User@123";
-      
+
       const { error } = await authClient.signIn.email({ email, password });
-      
+
       if (error) throw new Error(error.message);
-      
+
       await fetchUser();
       router.push("/dashboard");
     } catch (error: any) {
@@ -83,23 +83,39 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
+  async function handleGoogleLogin() {
+    try {
+      setIsLoading(true);
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${window.location.origin}/dashboard`,
+      });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in with Google");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
         <div className="absolute inset-0 bg-primary" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80')] bg-cover mix-blend-overlay opacity-20" />
-        
+
         <div className="relative z-20 flex items-center gap-2 text-lg font-medium">
           <Compass className="h-6 w-6" />
           CareerPilot AI
         </div>
-        
+
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              "This AI platform transformed my job search. The resume analysis was spot on, and the interview prep gave me the confidence to land my dream job at a top tech company."
+              "This AI platform transformed my job search. The resume analysis
+              was spot on, and the interview prep gave me the confidence to land
+              my dream job at a top tech company."
             </p>
             <footer className="text-sm">Sofia Davis</footer>
           </blockquote>
@@ -120,32 +136,39 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  placeholder="name@example.com" 
-                  {...register("email")} 
-                  disabled={isLoading} 
+                <Input
+                  id="email"
+                  placeholder="name@example.com"
+                  {...register("email")}
+                  disabled={isLoading}
                 />
                 {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
                     Forgot password?
                   </Link>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  placeholder="••••••••" 
-                  {...register("password")} 
-                  disabled={isLoading} 
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  {...register("password")}
+                  disabled={isLoading}
                 />
                 {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
@@ -165,7 +188,12 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button variant="outline" type="button" disabled={isLoading} onClick={() => {}}>
+            <Button
+              variant="outline"
+              type="button"
+              disabled={isLoading}
+              onClick={handleGoogleLogin}
+            >
               <svg role="img" viewBox="0 0 24 24" className="mr-2 h-4 w-4">
                 <path
                   fill="currentColor"
@@ -177,12 +205,24 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-4 p-4 border rounded-lg bg-muted/50 space-y-2">
-            <p className="text-sm font-medium text-center mb-2">Demo Credentials</p>
+            <p className="text-sm font-medium text-center mb-2">
+              Demo Credentials
+            </p>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="secondary" size="sm" onClick={() => handleDemoLogin("user")} disabled={isLoading}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleDemoLogin("user")}
+                disabled={isLoading}
+              >
                 User Login
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => handleDemoLogin("admin")} disabled={isLoading}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleDemoLogin("admin")}
+                disabled={isLoading}
+              >
                 Admin Login
               </Button>
             </div>
@@ -190,11 +230,17 @@ export default function LoginPage() {
 
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
-            <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
+            <Link
+              href="/terms"
+              className="underline underline-offset-4 hover:text-primary"
+            >
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">
+            <Link
+              href="/privacy"
+              className="underline underline-offset-4 hover:text-primary"
+            >
               Privacy Policy
             </Link>
             .
@@ -202,7 +248,10 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground mt-4">
             Don't have an account?{" "}
-            <Link href="/register" className="font-medium text-primary hover:underline">
+            <Link
+              href="/register"
+              className="font-medium text-primary hover:underline"
+            >
               Sign up
             </Link>
           </p>

@@ -12,7 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Star, Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, Filter, FileText, Bot, MessageSquare, Map, Target, BarChart3, Briefcase, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useState, useMemo, useCallback, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Custom hook for debouncing
@@ -34,33 +35,30 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const ITEMS_PER_PAGE = 6;
 
-export default function ServicesPage() {
-  const [search, setSearch] = useState("");
+function ServicesContent() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const initialCategory = searchParams.get("category") || "all";
+
+  const [search, setSearch] = useState(initialSearch);
   const debouncedSearch = useDebounce(search, 500); // 500ms debounce
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(initialCategory);
   const [sortBy, setSortBy] = useState("newest");
   const [page, setPage] = useState(1);
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState<"all" | "free" | "paid" | "custom">("all");
 
-  // Derived price values
-  const computedMinPrice = useMemo(() => {
-    if (priceRange === "free") return "0";
-    if (priceRange === "paid") return "1";
-    if (priceRange === "custom") return minPrice;
-    return "";
-  }, [priceRange, minPrice]);
-
-  const computedMaxPrice = useMemo(() => {
-    if (priceRange === "free") return "0";
-    if (priceRange === "custom") return maxPrice;
-    return "";
-  }, [priceRange, maxPrice]);
+  // Sync with URL params if they change
+  useEffect(() => {
+    if (initialSearch && initialSearch !== search) {
+      setSearch(initialSearch);
+    }
+    if (initialCategory && initialCategory !== category) {
+      setCategory(initialCategory);
+    }
+  }, [initialSearch, initialCategory]);
 
   const { data: servicesResponse, isLoading } = useQuery({
-    queryKey: ["services", debouncedSearch, category, sortBy, page, computedMinPrice, computedMaxPrice],
+    queryKey: ["services", debouncedSearch, category, sortBy, page],
     queryFn: () =>
       api.get("/services", {
         params: {
@@ -69,8 +67,6 @@ export default function ServicesPage() {
           sortBy,
           page,
           limit: ITEMS_PER_PAGE,
-          minPrice: computedMinPrice || undefined,
-          maxPrice: computedMaxPrice || undefined,
         },
       }),
   });
@@ -105,26 +101,14 @@ export default function ServicesPage() {
     setPage(1);
   }, []);
 
-  const handlePriceRangeChange = useCallback((val: string) => {
-    setPriceRange(val as any);
-    if (val !== "custom") {
-      setMinPrice("");
-      setMaxPrice("");
-    }
-    setPage(1);
-  }, []);
-
   const clearAllFilters = () => {
     setSearch("");
     setCategory("all");
     setSortBy("newest");
-    setPriceRange("all");
-    setMinPrice("");
-    setMaxPrice("");
     setPage(1);
   };
 
-  const hasActiveFilters = search || category !== "all" || sortBy !== "newest" || priceRange !== "all";
+  const hasActiveFilters = search || category !== "all" || sortBy !== "newest";
 
   // Pagination helpers
   const totalPages = meta.totalPages || 1;
@@ -263,8 +247,6 @@ export default function ServicesPage() {
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
                 <SelectItem value="rating">Highest Rated</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -291,49 +273,7 @@ export default function ServicesPage() {
                 className="overflow-hidden"
               >
                 <div className="pt-4 mt-4 border-t border-border/50">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Price Range Filter */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold">Price Range</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { value: "all", label: "All" },
-                          { value: "free", label: "Free" },
-                          { value: "paid", label: "Paid" },
-                          { value: "custom", label: "Custom" },
-                        ].map((option) => (
-                          <Button
-                            key={option.value}
-                            variant={priceRange === option.value ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handlePriceRangeChange(option.value)}
-                            className="rounded-full text-xs h-8"
-                          >
-                            {option.label}
-                          </Button>
-                        ))}
-                      </div>
-                      {priceRange === "custom" && (
-                        <div className="flex gap-2 items-center">
-                          <Input
-                            type="number"
-                            placeholder="Min $"
-                            value={minPrice}
-                            onChange={(e) => { setMinPrice(e.target.value); setPage(1); }}
-                            className="w-24 h-9 text-sm"
-                          />
-                          <span className="text-muted-foreground text-sm">to</span>
-                          <Input
-                            type="number"
-                            placeholder="Max $"
-                            value={maxPrice}
-                            onChange={(e) => { setMaxPrice(e.target.value); setPage(1); }}
-                            className="w-24 h-9 text-sm"
-                          />
-                        </div>
-                      )}
-                    </div>
-
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Results Per Page */}
                     <div className="space-y-3">
                       <Label className="text-sm font-semibold">Results Info</Label>
@@ -387,17 +327,9 @@ export default function ServicesPage() {
                   </button>
                 </Badge>
               )}
-              {priceRange !== "all" && (
-                <Badge variant="secondary" className="gap-1 pr-1">
-                  Price: {priceRange === "free" ? "Free" : priceRange === "paid" ? "Paid" : `$${minPrice || "0"} - $${maxPrice || "∞"}`}
-                  <button onClick={() => handlePriceRangeChange("all")} className="ml-1 hover:bg-muted rounded-full p-0.5">
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              )}
               {sortBy !== "newest" && (
                 <Badge variant="secondary" className="gap-1 pr-1">
-                  Sort: {sortBy === "rating" ? "Highest Rated" : sortBy === "price-low" ? "Price ↑" : "Price ↓"}
+                  Sort: {sortBy === "rating" ? "Highest Rated" : "Newest"}
                   <button onClick={() => handleSortChange("newest")} className="ml-1 hover:bg-muted rounded-full p-0.5">
                     <X className="w-3 h-3" />
                   </button>
@@ -498,13 +430,7 @@ export default function ServicesPage() {
                     </CardContent>
 
                     <CardFooter className="flex justify-between items-center pt-0 border-t border-border/50 mt-2">
-                      <div>
-                        {service.price > 0 ? (
-                          <span className="text-xl font-bold">${service.price}</span>
-                        ) : (
-                          <Badge variant="secondary" className="text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400">Free</Badge>
-                        )}
-                      </div>
+                      <div />
                       <Link
                         href={`/services/${service.id}`}
                         className={cn(buttonVariants({ size: "sm" }), "rounded-full gap-1.5")}
@@ -570,5 +496,13 @@ export default function ServicesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading services...</div>}>
+      <ServicesContent />
+    </Suspense>
   );
 }
