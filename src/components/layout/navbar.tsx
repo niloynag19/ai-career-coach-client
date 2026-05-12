@@ -31,7 +31,7 @@ const navLinks = [
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, fetchUser } = useAuthStore();
+  const { user, isAuthenticated, fetchUser, isLoading } = useAuthStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -87,7 +87,11 @@ export function Navbar() {
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
           <ThemeToggle />
-          {isAuthenticated ? (
+          {isLoading ? (
+            <div className="flex items-center gap-2 px-4">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </div>
+          ) : isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="outline-none">
                 <div className={cn(buttonVariants({ variant: "ghost" }), "relative h-10 w-10 rounded-full p-0")}>
@@ -197,7 +201,11 @@ export function Navbar() {
             </Link>
           ))}
           <div className="h-px bg-border my-2" />
-          {isAuthenticated ? (
+          {isLoading ? (
+            <div className="flex justify-center p-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            </div>
+          ) : isAuthenticated ? (
             <>
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="p-3 text-sm font-medium rounded-lg hover:bg-muted">
                 Dashboard
