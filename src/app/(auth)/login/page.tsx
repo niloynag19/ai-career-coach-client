@@ -77,8 +77,8 @@ export default function LoginPage() {
       if (error) throw new Error(error.message);
 
       toast.success("Logged in with demo account");
-      router.push("/dashboard");
-      fetchUser();
+      await fetchUser();
+      router.push("/");
     } catch (error: any) {
       toast.error(error.message || "Failed to log in with demo account");
     } finally {
