@@ -41,7 +41,7 @@ export default function LoginPage() {
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
     try {
-      const { data: signInData, error } = await authClient.signIn.email({
+      const { error } = await authClient.signIn.email({
         email: data.email,
         password: data.password,
       });
@@ -51,9 +51,9 @@ export default function LoginPage() {
         return;
       }
 
-      await fetchUser();
-      router.push("/dashboard");
       toast.success("Logged in successfully");
+      router.push("/dashboard");
+      fetchUser();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -76,8 +76,9 @@ export default function LoginPage() {
 
       if (error) throw new Error(error.message);
 
-      await fetchUser();
+      toast.success("Logged in with demo account");
       router.push("/dashboard");
+      fetchUser();
     } catch (error: any) {
       toast.error(error.message || "Failed to log in with demo account");
     } finally {
@@ -139,6 +140,7 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   placeholder="name@example.com"
+                  autoComplete="email"
                   {...register("email")}
                   disabled={isLoading}
                 />
@@ -162,6 +164,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   {...register("password")}
                   disabled={isLoading}
                 />
